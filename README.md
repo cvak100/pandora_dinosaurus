@@ -19,7 +19,3 @@ pip install -r requirements.txt
 # place farm.db + weather JSON under data/raw/
 python app.py
 ```
-
-## License
-
-Add a license before relying on public reuse. Until then, all rights reserved by the author.
