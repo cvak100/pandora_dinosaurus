@@ -1,0 +1,39 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Local farm data (never commit real dumps)
+data/raw/**
+data/processed/**
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Models (large / regenerable)
+models/*.joblib
+models/*.pkl
+models/*.txt
+!models/metrics.json
+
+# Reports that may contain identifying detail
+reports/*.pdf
+reports/franko_*.pdf
+
+# Local overrides
+*.local

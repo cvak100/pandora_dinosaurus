@@ -1,0 +1,686 @@
+{
+  "generated_at": "2026-08-04T12:17:53.441880+00:00",
+  "period_start": "2025-01-01",
+  "period_end": "2026-08-02",
+  "sections": {
+    "change-points": {
+      "slug": "change-points",
+      "findings": [
+        "PELT našel 8 prelomov na eggs/hen (min. segment 14 dni).",
+        "Binary Segmentation (6 prelomov) doda alternativne kandidatne datume.",
+        "Prelomi so hipoteze — preveri dogodke/krmo/mraz okoli teh datumov, tudi če niso zabeleženi."
+      ],
+      "tables": {
+        "pelt": [
+          {
+            "method": "PELT",
+            "date": "2025-01-27",
+            "index": 26,
+            "pre7_eph": 0.571,
+            "post7_eph": 0.595,
+            "delta": 0.024
+          },
+          {
+            "method": "PELT",
+            "date": "2025-08-07",
+            "index": 218,
+            "pre7_eph": 0.558,
+            "post7_eph": 0.497,
+            "delta": -0.061
+          },
+          {
+            "method": "PELT",
+            "date": "2025-09-17",
+            "index": 259,
+            "pre7_eph": 0.607,
+            "post7_eph": 0.36,
+            "delta": -0.247
+          },
+          {
+            "method": "PELT",
+            "date": "2025-10-22",
+            "index": 294,
+            "pre7_eph": 0.22,
+            "post7_eph": 0.332,
+            "delta": 0.112
+          },
+          {
+            "method": "PELT",
+            "date": "2025-12-11",
+            "index": 344,
+            "pre7_eph": 0.468,
+            "post7_eph": 0.558,
+            "delta": 0.091
+          },
+          {
+            "method": "PELT",
+            "date": "2026-01-13",
+            "index": 377,
+            "pre7_eph": 0.686,
+            "post7_eph": 0.771,
+            "delta": 0.086
+          },
+          {
+            "method": "PELT",
+            "date": "2026-05-12",
+            "index": 496,
+            "pre7_eph": 0.743,
+            "post7_eph": 0.614,
+            "delta": -0.129
+          },
+          {
+            "method": "PELT",
+            "date": "2026-07-03",
+            "index": 547,
+            "pre7_eph": 0.571,
+            "post7_eph": 0.471,
+            "delta": -0.1
+          }
+        ],
+        "binseg": [
+          {
+            "method": "BinSeg",
+            "date": "2025-09-17",
+            "index": 259,
+            "pre7_eph": 0.607,
+            "post7_eph": 0.36,
+            "delta": -0.247
+          },
+          {
+            "method": "BinSeg",
+            "date": "2025-11-01",
+            "index": 304,
+            "pre7_eph": 0.321,
+            "post7_eph": 0.381,
+            "delta": 0.06
+          },
+          {
+            "method": "BinSeg",
+            "date": "2025-12-16",
+            "index": 349,
+            "pre7_eph": 0.571,
+            "post7_eph": 0.571,
+            "delta": 0.0
+          },
+          {
+            "method": "BinSeg",
+            "date": "2026-01-10",
+            "index": 374,
+            "pre7_eph": 0.714,
+            "post7_eph": 0.714,
+            "delta": 0.0
+          },
+          {
+            "method": "BinSeg",
+            "date": "2026-05-10",
+            "index": 494,
+            "pre7_eph": 0.729,
+            "post7_eph": 0.671,
+            "delta": -0.057
+          },
+          {
+            "method": "BinSeg",
+            "date": "2026-06-25",
+            "index": 539,
+            "pre7_eph": 0.614,
+            "post7_eph": 0.586,
+            "delta": -0.029
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "cp_01_eggs_per_hen.png",
+          "title": "PELT / BinSeg na eggs/hen",
+          "help": "Navpične črte = ocenjeni prelomi režima. Oranžna = PELT, zelena = Binary Segmentation."
+        },
+        {
+          "name": "cp_02_eggs_abs.png",
+          "title": "PELT na absolutnih jajcih",
+          "help": "Prelomi na surovem številu jajc (bolj občutljivo na spremembo velikosti jate)."
+        }
+      ],
+      "notes": [
+        "Metode: ruptures PELT (RBF) in Binary Segmentation (L2).",
+        "Bayesian CPD ni vključen (težji stack); PELT je praktičen baseline.",
+        "Delta = povprečje eggs/hen 7 dni po − 7 dni pred prelomom."
+      ]
+    },
+    "event-impact": {
+      "slug": "event-impact",
+      "findings": [
+        "Impulse response kaže trajanje učinka, ne samo povprečje pred/po.",
+        "DiD tukaj = (Δ po dogodku) − (Δ v istem koledarskem oknu ±1 leto), kjer podatki obstajajo.",
+        "Povprečni DiD za pogine: +0.018 eggs/hen (sezonsko korigirano)."
+      ],
+      "tables": {
+        "summary": [
+          {
+            "event": "Pogin",
+            "n": 4,
+            "pre14": 0.527,
+            "post14": 0.544,
+            "delta": 0.017
+          },
+          {
+            "event": "Izpust",
+            "n": 3,
+            "pre14": 0.445,
+            "post14": 0.458,
+            "delta": 0.013
+          },
+          {
+            "event": "Dodajanje",
+            "n": 1,
+            "pre14": 0.571,
+            "post14": 0.253,
+            "delta": -0.319
+          },
+          {
+            "event": "Sprememba hrane",
+            "n": 5,
+            "pre14": 0.537,
+            "post14": 0.538,
+            "delta": 0.001
+          },
+          {
+            "event": "Anomalija jajc",
+            "n": 12,
+            "pre14": 0.527,
+            "post14": 0.522,
+            "delta": -0.004
+          }
+        ],
+        "did_death": [
+          {
+            "event_date": "2025-06-03",
+            "control_year_shift": 1,
+            "treated_delta": 0.056,
+            "control_delta": 0.037,
+            "did": 0.018
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "ev_01_impulse.png",
+          "title": "Impulse response",
+          "help": "Povprečna eggs/hen po dnevih okoli dogodka. Dan 0 = dogodek."
+        },
+        {
+          "name": "ev_02_before_after.png",
+          "title": "Before–After Δ",
+          "help": "Razlika povprečja 14 dni po − 14 dni pred. Zeleno = rast, oranžno = padec."
+        }
+      ],
+      "notes": [
+        "Klasični DiD z večjatno kontrolo ni mogoč (ena jata). Uporabljena je sezonska kontrola YoY.",
+        "Impulse window: −14 … +21 dni."
+      ]
+    },
+    "decomposition": {
+      "slug": "decomposition",
+      "findings": [
+        "STL loči tedensko sezono (period=7), počasni trend in ostanek.",
+        "V residualih je 32 dni z |z|>2.5 — kandidati za nepojasnjene padce/rasti.",
+        "Če residual pade, trend/sezona tega ne pojasnita → išči dogodek, bolezen, krmo, merilno napako."
+      ],
+      "tables": {
+        "top_residuals": [
+          {
+            "date": "2025-01-07",
+            "residual": 0.424,
+            "abs_z": 4.7
+          },
+          {
+            "date": "2025-01-25",
+            "residual": -0.405,
+            "abs_z": 4.21
+          },
+          {
+            "date": "2026-01-30",
+            "residual": -0.392,
+            "abs_z": 4.07
+          },
+          {
+            "date": "2026-01-23",
+            "residual": -0.389,
+            "abs_z": 4.03
+          },
+          {
+            "date": "2025-11-14",
+            "residual": -0.385,
+            "abs_z": 3.99
+          },
+          {
+            "date": "2025-12-16",
+            "residual": -0.377,
+            "abs_z": 3.9
+          },
+          {
+            "date": "2025-12-20",
+            "residual": -0.348,
+            "abs_z": 3.59
+          },
+          {
+            "date": "2025-09-13",
+            "residual": 0.307,
+            "abs_z": 3.44
+          },
+          {
+            "date": "2025-10-31",
+            "residual": -0.33,
+            "abs_z": 3.4
+          },
+          {
+            "date": "2026-01-10",
+            "residual": -0.316,
+            "abs_z": 3.25
+          },
+          {
+            "date": "2025-09-09",
+            "residual": -0.316,
+            "abs_z": 3.25
+          },
+          {
+            "date": "2026-01-20",
+            "residual": 0.282,
+            "abs_z": 3.18
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "dec_01_stl.png",
+          "title": "STL komponente",
+          "help": "Observed = Trend + Seasonal + Residual. Analiziraj predvsem residual."
+        },
+        {
+          "name": "dec_02_residuals.png",
+          "title": "Residual outliers",
+          "help": "Rdeče točke = dnevi, kjer ostanek močno odstopa od 0."
+        }
+      ],
+      "notes": [
+        "Uporabljen statsmodels STL (robust=True, period=7).",
+        "Za letno sezono bi potrebovali daljšo serijo; tukaj je poudarek na tedenskem ritmu + trendu."
+      ]
+    },
+    "clustering": {
+      "slug": "clustering",
+      "findings": [
+        "KMeans (k=4) na standardiziranih tedenskih featurejih.",
+        "Clusterji pomagajo opisati režime (npr. zimski vs varčen visokodonosen)."
+      ],
+      "tables": {
+        "clusters": [
+          {
+            "cluster": 0,
+            "label": "Srednji / mešani režim",
+            "n_weeks": 24,
+            "eggs_per_hen_day": 0.552,
+            "feed_per_bird_day_kg": 0.153,
+            "temp_avg": 19.724,
+            "precipitation": 39.333,
+            "hens_mean": 10.012
+          },
+          {
+            "cluster": 1,
+            "label": "Nizka produkcija / stres",
+            "n_weeks": 7,
+            "eggs_per_hen_day": 0.405,
+            "feed_per_bird_day_kg": 0.114,
+            "temp_avg": 11.86,
+            "precipitation": 159.271,
+            "hens_mean": 12.306
+          },
+          {
+            "cluster": 2,
+            "label": "Zimski / hladnejši režim",
+            "n_weeks": 30,
+            "eggs_per_hen_day": 0.511,
+            "feed_per_bird_day_kg": 0.115,
+            "temp_avg": 7.715,
+            "precipitation": 12.16,
+            "hens_mean": 11.919
+          },
+          {
+            "cluster": 3,
+            "label": "Srednji / mešani režim",
+            "n_weeks": 22,
+            "eggs_per_hen_day": 0.73,
+            "feed_per_bird_day_kg": 0.149,
+            "temp_avg": 6.58,
+            "precipitation": 32.514,
+            "hens_mean": 10.013
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "cl_01_timeline.png",
+          "title": "Clusterji skozi čas",
+          "help": "Vsaka točka = teden. Barva = skupina podobnega vedenja."
+        },
+        {
+          "name": "cl_02_feed_vs_eph.png",
+          "title": "Hrana vs produkcija",
+          "help": "Ali so clusterji ločeni po učinkovitosti (veliko jajc / malo hrane)."
+        }
+      ],
+      "notes": [
+        "Featureji: eggs_per_hen_day, feed_per_bird_day_kg, temp_avg, precipitation, hens_mean.",
+        "DTW ni uporabljen (kratek nabor tednov); KMeans je jasen baseline."
+      ]
+    },
+    "efficiency": {
+      "slug": "efficiency",
+      "findings": [
+        "Povprečna učinkovitost: 4.32 jajc / kg hrane.",
+        "Frontier = zgornjih 10% tednov (≥ 5.50 jajc/kg).",
+        "Če krivulja kvintilov flatenira, dodatna hrana prinese malo dodatnih jajc."
+      ],
+      "tables": {
+        "top_weeks": [
+          {
+            "week_start": "2025-03-24",
+            "eggs": 44.0,
+            "feed_kg": 3.22,
+            "hens": 12.0,
+            "eggs_per_kg": 13.66
+          },
+          {
+            "week_start": "2025-04-21",
+            "eggs": 47.0,
+            "feed_kg": 5.46,
+            "hens": 12.0,
+            "eggs_per_kg": 8.61
+          },
+          {
+            "week_start": "2025-03-31",
+            "eggs": 46.0,
+            "feed_kg": 5.46,
+            "hens": 12.0,
+            "eggs_per_kg": 8.42
+          },
+          {
+            "week_start": "2025-04-28",
+            "eggs": 46.0,
+            "feed_kg": 5.46,
+            "hens": 12.0,
+            "eggs_per_kg": 8.42
+          },
+          {
+            "week_start": "2025-04-07",
+            "eggs": 44.0,
+            "feed_kg": 5.46,
+            "hens": 12.0,
+            "eggs_per_kg": 8.06
+          },
+          {
+            "week_start": "2025-04-14",
+            "eggs": 44.0,
+            "feed_kg": 5.46,
+            "hens": 12.0,
+            "eggs_per_kg": 8.06
+          },
+          {
+            "week_start": "2025-05-26",
+            "eggs": 45.0,
+            "feed_kg": 6.96,
+            "hens": 12.0,
+            "eggs_per_kg": 6.47
+          },
+          {
+            "week_start": "2025-06-02",
+            "eggs": 46.0,
+            "feed_kg": 7.46,
+            "hens": 11.3,
+            "eggs_per_kg": 6.17
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "ef_01_frontier.png",
+          "title": "Eggs vs feed frontier",
+          "help": "Oranžni tedni so empirično najbolj učinkoviti (veliko jajc na kg hrane)."
+        },
+        {
+          "name": "ef_02_eggs_per_kg.png",
+          "title": "Eggs/kg skozi čas",
+          "help": "Časovna vrsta učinkovitosti. Črtkana = 90. percentil."
+        },
+        {
+          "name": "ef_03_diminishing.png",
+          "title": "Padajoči donosi hrane",
+          "help": "Povprečna eggs/hen po kvintilih dnevne hrane na žival."
+        }
+      ],
+      "notes": [
+        "Hrana vključuje petelina; jajca so samo od kokoši — to je namerno za farm efficiency.",
+        "Ni DEA/optimizacijski frontier model; empirični P90 je interpretabilen baseline."
+      ]
+    },
+    "interactions": {
+      "slug": "interactions",
+      "findings": [
+        "Mraz po stresnem dogodku je lahko drugačen kot mraz v mirnem obdobju.",
+        "Heatmapa hrana×temp pokaže, v katerem režimu hrana najbolj “deluje”.",
+        "Nova jata × dež: primerjava nesnosti v suhem/deževnem dnevu."
+      ],
+      "tables": {
+        "cold_stress": [
+          {
+            "cold": false,
+            "stress_7d": false,
+            "mean_eph": 0.577,
+            "n": 396
+          },
+          {
+            "cold": false,
+            "stress_7d": true,
+            "mean_eph": 0.489,
+            "n": 64
+          },
+          {
+            "cold": true,
+            "stress_7d": false,
+            "mean_eph": 0.624,
+            "n": 89
+          },
+          {
+            "cold": true,
+            "stress_7d": true,
+            "mean_eph": 0.547,
+            "n": 27
+          }
+        ],
+        "flock_rain": [
+          {
+            "new_flock_30d": false,
+            "rainy": false,
+            "mean_eph": 0.591
+          },
+          {
+            "new_flock_30d": false,
+            "rainy": true,
+            "mean_eph": 0.592
+          },
+          {
+            "new_flock_30d": true,
+            "rainy": false,
+            "mean_eph": 0.238
+          },
+          {
+            "new_flock_30d": true,
+            "rainy": true,
+            "mean_eph": 0.262
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "ix_01_temp_stress.png",
+          "title": "Temp × stres",
+          "help": "Krivulji eggs/hen po temperaturi, ločeno glede na stres v zadnjih 7 dneh."
+        },
+        {
+          "name": "ix_02_feed_temp_heatmap.png",
+          "title": "Hrana × temperatura",
+          "help": "Povprečna eggs/hen v kombinacijah tertilov hrane in temperature."
+        },
+        {
+          "name": "ix_03_flock_rain.png",
+          "title": "Nova jata × dež",
+          "help": "Ali nova jata (30 dni po dodajanju) drugače reagira na dež."
+        }
+      ],
+      "notes": [
+        "Interakcije so deskriptivne (ne polni kauzalni model).",
+        "cold = spodnjih 20% temp_avg; stress_7d = smrt/izpust/hrana/dodajanje v 7 dneh."
+      ]
+    },
+    "anomalies": {
+      "slug": "anomalies",
+      "findings": [
+        "Isolation Forest označil 29 dni; LOF 29.",
+        "Presek (bolj zanesljivi kandidati): 14 dni.",
+        "Tedenski IF outlierji: 7."
+      ],
+      "tables": {
+        "daily_both": [
+          {
+            "date": "2025-03-27",
+            "eggs": 4.0,
+            "eggs_per_hen": 0.333,
+            "feed_kg": 0.46,
+            "temp_avg": 13.0,
+            "precipitation": 0.0
+          },
+          {
+            "date": "2025-03-31",
+            "eggs": 9.0,
+            "eggs_per_hen": 0.75,
+            "feed_kg": 0.78,
+            "temp_avg": 10.71,
+            "precipitation": 0.0
+          },
+          {
+            "date": "2025-04-02",
+            "eggs": 3.0,
+            "eggs_per_hen": 0.25,
+            "feed_kg": 0.78,
+            "temp_avg": 12.62,
+            "precipitation": 0.0
+          },
+          {
+            "date": "2025-04-06",
+            "eggs": 7.0,
+            "eggs_per_hen": 0.583,
+            "feed_kg": 0.78,
+            "temp_avg": 8.0,
+            "precipitation": 0.0
+          },
+          {
+            "date": "2025-05-22",
+            "eggs": 6.0,
+            "eggs_per_hen": 0.5,
+            "feed_kg": 1.28,
+            "temp_avg": 12.01,
+            "precipitation": 104.4
+          },
+          {
+            "date": "2025-08-21",
+            "eggs": 2.0,
+            "eggs_per_hen": 0.222,
+            "feed_kg": 1.5,
+            "temp_avg": 17.93,
+            "precipitation": 20.2
+          },
+          {
+            "date": "2025-09-10",
+            "eggs": 6.0,
+            "eggs_per_hen": 0.75,
+            "feed_kg": 1.51,
+            "temp_avg": 16.11,
+            "precipitation": 83.4
+          },
+          {
+            "date": "2025-09-12",
+            "eggs": 4.0,
+            "eggs_per_hen": 0.5,
+            "feed_kg": 1.51,
+            "temp_avg": 16.83,
+            "precipitation": 39.6
+          },
+          {
+            "date": "2025-09-16",
+            "eggs": 5.0,
+            "eggs_per_hen": 0.625,
+            "feed_kg": 1.5,
+            "temp_avg": 16.51,
+            "precipitation": 47.6
+          },
+          {
+            "date": "2025-09-24",
+            "eggs": 1.0,
+            "eggs_per_hen": 0.077,
+            "feed_kg": 1.5,
+            "temp_avg": 14.07,
+            "precipitation": 35.9
+          },
+          {
+            "date": "2025-10-05",
+            "eggs": 2.0,
+            "eggs_per_hen": 0.154,
+            "feed_kg": 1.5,
+            "temp_avg": 6.89,
+            "precipitation": 95.5
+          },
+          {
+            "date": "2025-10-23",
+            "eggs": 5.0,
+            "eggs_per_hen": 0.385,
+            "feed_kg": 1.5,
+            "temp_avg": 11.72,
+            "precipitation": 122.3
+          },
+          {
+            "date": "2026-07-26",
+            "eggs": 4.0,
+            "eggs_per_hen": 0.444,
+            "feed_kg": 1.81,
+            "temp_avg": 16.83,
+            "precipitation": 68.4
+          },
+          {
+            "date": "2026-08-02",
+            "eggs": 4.0,
+            "eggs_per_hen": 0.5,
+            "feed_kg": 0.78,
+            "temp_avg": 25.64,
+            "precipitation": 0.0
+          }
+        ]
+      },
+      "charts": [
+        {
+          "name": "an_01_daily.png",
+          "title": "Dnevne anomalije",
+          "help": "Rdeče = IF in LOF se strinjata. Oranžno = samo Isolation Forest."
+        },
+        {
+          "name": "an_02_weekly.png",
+          "title": "Tedenske anomalije",
+          "help": "Tedni, ki so nenavadni glede na jajca+hrano+vreme+jate."
+        }
+      ],
+      "notes": [
+        "Featureji: eggs, eggs_per_hen, feed_kg, feed_per_bird_kg, feed_per_hen_kg, temp_avg, precipitation, humidity_avg, hens.",
+        "Seasonal Hybrid ESD ni ločeno implementiran; STL residuali pokrivajo sezonski del (glej Decomposition).",
+        "contamination≈5–8% — pričakuj redke, a ne prazne zadetke."
+      ]
+    }
+  }
+}

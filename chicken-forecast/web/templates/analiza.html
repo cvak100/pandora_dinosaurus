@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ app_name }} – Analiza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+      <a href="{{ url_for('index') }}">Napoved</a>
+      <a href="{{ url_for('analiza') }}" class="active">Analiza</a>
+    </nav>
+
+    <header class="hero">
+      <p class="brand">{{ app_brand }} · {{ flock_user }} · <a href="{{ url_for('analiza') }}">hub</a></p>
+      <h1>Zgodovinska analiza (pregled)</h1>
+      <p class="lede">
+        Pregled produkcije, hrane, vremena in dogodkov —
+        {{ analysis.period_start }} → {{ analysis.period_end }}
+        ({{ analysis.n_days }} dni ≈ {{ analysis.n_years }} leti).
+      </p>
+    </header>
+
+    <section class="actions">
+      <a class="btn-link accent-link" href="{{ url_for('analiza_pdf') }}">Download PDF (vse)</a>
+      <form method="post" action="{{ url_for('run_action', action='rebuild') }}">
+        <button type="submit">Obnovi dataset</button>
+      </form>
+      <form method="post" action="{{ url_for('run_action', action='eda') }}">
+        <button type="submit" class="primary">Osveži EDA grafe</button>
+      </form>
+      <a class="btn-link" href="{{ url_for('analiza') }}">← Hub</a>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <pre class="banner {{ category }}">{{ message }}</pre>
+      {% endfor %}
+    {% endwith %}
+
+    {% if error %}
+    <div class="banner error">Napaka pri analizi: {{ error }}</div>
+    {% endif %}
+
+    {% if analysis %}
+    <section class="forecast">
+      <div class="forecast-main">
+        <p class="label">Skupaj zbrana jajca</p>
+        <p class="week">{{ analysis.period_start }} – {{ analysis.period_end }}
+          <span class="pill">{{ analysis.n_weeks }} tednov</span>
+        </p>
+        <p class="big">{{ analysis.total_eggs }} <span>jajc</span></p>
+        <p class="sub">povprečje {{ analysis.mean_eggs }}/dan · mediana {{ analysis.median_eggs }} · max {{ analysis.max_eggs }}</p>
+        <p class="explain">
+          Analiza zajema dnevne zapise samo za uporabnika <strong>{{ flock_user }}</strong>.
+          Manjkajoči egg-zapis: {{ analysis.missing_eggs }} dan.
+          Jajca/kokoš štejejo samo kokoši; hrana vključuje tudi petelina.
+        </p>
+      </div>
+      <div class="forecast-side">
+        <div class="stat">
+          <span class="label">Jajca / kokoš / dan</span>
+          <strong>{{ analysis.eggs_per_hen }}</strong>
+          <em>ključni KPI nesnosti (brez petelina)</em>
+        </div>
+        <div class="stat">
+          <span class="label">Kokoši (min–max)</span>
+          <strong>{{ analysis.min_hens }}–{{ analysis.max_hens }}</strong>
+          <em>povprečje {{ analysis.mean_hens }} · petelin ≈ {{ analysis.mean_roosters }}</em>
+        </div>
+        <div class="stat">
+          <span class="label">Hrana</span>
+          <strong>{{ analysis.feed_kg_day }} kg</strong>
+          <em>{{ analysis.feed_g_per_bird|int }} g/žival/dan · {{ analysis.feed_per_egg_kg }} kg/jajce</em>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <h2>Ključni kazalniki</h2>
+      <p class="section-help">
+        Povzetek celotnega obdobja. Vsako polje ima razlago — kaj meri in kako ga brati.
+      </p>
+      <div class="metric-grid">
+        <div class="metric">
+          <span class="label">Obdobje</span>
+          <strong class="small">{{ analysis.n_years }} let</strong>
+          <p class="field-help">{{ analysis.n_days }} zaporednih dni od {{ analysis.period_start }} do {{ analysis.period_end }}.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Tedensko povprečje</span>
+          <strong>{{ analysis.weekly_eggs_mean }}</strong>
+          <p class="field-help">Povprečna vsota jajc na ISO teden (pon–ned). To je enaka tarča kot napovedni model.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Najboljši mesec</span>
+          <strong class="small">{{ analysis.best_month }}</strong>
+          <p class="field-help">{{ analysis.best_eph }} jajc/kokoš/dan — najvišja povprečna nesnost v letu.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Najslabši mesec</span>
+          <strong class="small">{{ analysis.worst_month }}</strong>
+          <p class="field-help">{{ analysis.worst_eph }} jajc/kokoš/dan — tipično jesen (molting / krajši dan).</p>
+        </div>
+        <div class="metric">
+          <span class="label">Anomalije nizko / visoko</span>
+          <strong>{{ analysis.anomalies_low }} / {{ analysis.anomalies_high }}</strong>
+          <p class="field-help">Dnevi z |z| &gt; 2.5 glede na 28-dnevni baseline eggs/hen. Opozorilo za nenavadne dneve.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Konverzija hrane</span>
+          <strong>{{ analysis.feed_per_egg_kg }}</strong>
+          <p class="field-help">kg hrane na eno jajce. Nižje = učinkoviteje (hrana = kokoši + petelin).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <h2>Sezonalnost po mesecih</h2>
+      <p class="section-help">
+        Povprečna dnevna nesnost (jajca/kokoš) po mesecu. Uporabno za razumevanje, kdaj jata naravno nese več/manj.
+      </p>
+      <div class="month-table-wrap">
+        <table class="month-table">
+          <thead>
+            <tr>
+              <th>Mesec</th>
+              <th>Jajca/kokoš/dan</th>
+              <th>Jajca/dan</th>
+              <th>Št. dni</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in analysis.monthly %}
+            <tr class="{% if m.eggs_per_hen == analysis.best_eph %}best{% elif m.eggs_per_hen == analysis.worst_eph %}worst{% endif %}">
+              <td>{{ m.month }} · {{ m.name }}</td>
+              <td><strong>{{ "%.3f"|format(m.eggs_per_hen) }}</strong></td>
+              <td>{{ "%.2f"|format(m.eggs) }}</td>
+              <td>{{ m.n }}</td>
+              <td class="bar-cell"><span class="bar" style="--w: {{ (m.eggs_per_hen / analysis.best_eph * 100)|round }}%"></span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <h2>Vreme</h2>
+      <p class="section-help">
+        Linearna korelacija z eggs/hen (−1…+1). Blizu 0 = šibka linearna povezava; skrajnosti temperature so vseeno lahko drugačne.
+      </p>
+      <div class="metric-grid">
+        <div class="metric">
+          <span class="label">Corr. temp</span>
+          <strong>{{ analysis.corr.get('temp_avg', '—') }}</strong>
+          <p class="field-help">Korelacija povprečne temperature z jajci/kokoš.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Corr. padavine</span>
+          <strong>{{ analysis.corr.get('precipitation', '—') }}</strong>
+          <p class="field-help">Korelacija dnevnih padavin z jajci/kokoš.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Corr. dnevna svetloba</span>
+          <strong>{{ analysis.corr.get('daylight_minutes', '—') }}</strong>
+          <p class="field-help">Kjer so podatki na voljo (minut dnevne svetlobe).</p>
+        </div>
+        {% if analysis.extreme_temp.cold is not none %}
+        <div class="metric">
+          <span class="label">Najhladnejših 10%</span>
+          <strong>{{ analysis.extreme_temp.cold }}</strong>
+          <p class="field-help">Povprečna eggs/hen na najhladnejših dnevih.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Sredina</span>
+          <strong>{{ analysis.extreme_temp.mid }}</strong>
+          <p class="field-help">Eggs/hen na “običajnih” temperaturnih dnevih.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Najtoplejših 10%</span>
+          <strong>{{ analysis.extreme_temp.hot }}</strong>
+          <p class="field-help">Povprečna eggs/hen na najtoplejših dnevih.</p>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="metrics">
+      <h2>Vpliv dogodkov</h2>
+      <p class="section-help">
+        Primerjava eggs/hen 7 dni pred dogodkom in 14 dni po njem. Δ pozitiven = okrevanje / rast, negativen = padec.
+      </p>
+      <div class="month-table-wrap">
+        <table class="month-table">
+          <thead>
+            <tr>
+              <th>Dogodek</th>
+              <th>Št.</th>
+              <th>Pred (7d)</th>
+              <th>Po (14d)</th>
+              <th>Δ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in analysis.events %}
+            <tr>
+              <td>
+                <strong>{{ e.label }}</strong>
+                <span class="field-help">{{ e.key }}</span>
+              </td>
+              <td>{{ e.n }}</td>
+              <td>{% if e.pre is not none %}{{ e.pre }}{% else %}—{% endif %}</td>
+              <td>{% if e.post is not none %}{{ e.post }}{% else %}—{% endif %}</td>
+              <td class="{% if e.delta is not none and e.delta >= 0 %}pos{% elif e.delta is not none %}neg{% endif %}">
+                {% if e.delta is not none %}{{ "%+.3f"|format(e.delta) }}{% else %}—{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <h2>Glavni zaključki</h2>
+      <ul class="takeaways">
+        {% for t in analysis.takeaways %}
+        <li>{{ t }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section class="charts">
+      <h2>Grafi analize</h2>
+      <p class="section-help">
+        EDA izhodi iz <code>reports/</code>. Če manjkajo, klikni <strong>Osveži EDA grafe</strong>.
+      </p>
+      <div class="chart-grid">
+        {% for chart in charts %}
+        <figure>
+          <figcaption>
+            <strong>{{ chart.title }}</strong>
+            <span class="field-help">{{ chart.help }}</span>
+          </figcaption>
+          <img src="{{ url_for('report_file', filename=chart.name) }}" alt="{{ chart.title }}" loading="lazy" />
+        </figure>
+        {% else %}
+        <p>Ni grafov — klikni <strong>Osveži EDA grafe</strong>.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <footer>
+      <p><a href="{{ url_for('index') }}">← Nazaj na napoved</a> · http://127.0.0.1:5001/analiza</p>
+    </footer>
+  </div>
+</body>
+</html>

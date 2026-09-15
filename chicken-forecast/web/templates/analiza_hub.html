@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ app_name }} – Analiza{% endblock %}
+{% block body %}
+<header class="hero">
+  <p class="brand">{{ app_brand }} · {{ flock_user }}</p>
+  <h1>Napredna analiza</h1>
+  <p class="lede">
+    Zgodovina razdeljena na 7 metod.
+    {% if summary %}Obdobje {{ summary.period_start }} → {{ summary.period_end }}.{% endif %}
+  </p>
+</header>
+
+<section class="actions">
+  <a class="btn-link accent-link" href="{{ url_for('analiza_pdf') }}">Download PDF (vse)</a>
+  <a class="btn-link" href="{{ url_for('analiza_pdf', refresh=1) }}">PDF + osveži analize</a>
+  <form method="post" action="{{ url_for('run_action', action='advanced') }}"
+        onsubmit="return confirm('Ponovno izračunam vseh 7 analiz? (~nekaj sekund).');">
+    <button type="submit" class="primary">Izračunaj / osveži analize</button>
+  </form>
+  <form method="post" action="{{ url_for('run_action', action='eda') }}">
+    <button type="submit">Osnovni EDA grafi</button>
+  </form>
+  <a class="btn-link" href="{{ url_for('analiza_overview') }}">Klasični pregled</a>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+  <pre class="banner {{ category }}">{{ message }}</pre>
+  {% endfor %}
+{% endwith %}
+
+{% if error %}
+<div class="banner error">{{ error }}</div>
+{% endif %}
+
+<section class="section-grid">
+  {% for s in sections %}
+  <a class="section-card" href="{{ url_for('analiza_section', slug=s.slug) }}">
+    <h2>{{ s.title }}</h2>
+    <p>{{ s.blurb }}</p>
+    {% if summary and summary.sections.get(s.slug) %}
+    <p class="hint">
+      {{ summary.sections[s.slug].charts|length }} grafov ·
+      {{ summary.sections[s.slug].findings|length }} ugotovitev
+    </p>
+    {% else %}
+    <p class="hint">Še ni izračunano — klikni gumb zgoraj.</p>
+    {% endif %}
+  </a>
+  {% endfor %}
+</section>
+
+<footer>
+  <p>http://127.0.0.1:5001/analiza · vsaka metoda ima svojo podstran</p>
+</footer>
+{% endblock %}

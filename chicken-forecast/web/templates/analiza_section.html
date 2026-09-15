@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}{{ meta.title }} · {{ app_name }}{% endblock %}
+{% block body %}
+<header class="hero">
+  <p class="brand"><a href="{{ url_for('analiza') }}">Analiza</a> · {{ flock_user }}</p>
+  <h1>{{ meta.title }}</h1>
+  <p class="lede">{{ meta.blurb }}</p>
+</header>
+
+<nav class="subnav">
+  {% for s in sections %}
+  <a href="{{ url_for('analiza_section', slug=s.slug) }}" class="{% if s.slug == meta.slug %}active{% endif %}">{{ loop.index }}</a>
+  {% endfor %}
+</nav>
+
+<section class="actions">
+  <form method="post" action="{{ url_for('run_action', action='advanced') }}">
+    <button type="submit" class="primary">Osveži vse analize</button>
+  </form>
+  <a class="btn-link" href="{{ url_for('analiza') }}">← Hub</a>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+  <pre class="banner {{ category }}">{{ message }}</pre>
+  {% endfor %}
+{% endwith %}
+
+{% if error %}
+<div class="banner error">{{ error }}</div>
+{% elif not section %}
+<div class="banner error">Ni podatkov. Klikni <strong>Osveži vse analize</strong>.</div>
+{% else %}
+
+<section class="metrics">
+  <h2>Ugotovitve</h2>
+  <ul class="takeaways">
+    {% for f in section.findings %}
+    <li>{{ f }}</li>
+    {% endfor %}
+  </ul>
+  {% if section.notes %}
+  <h3>Metode / predpostavke</h3>
+  <ul class="takeaways">
+    {% for n in section.notes %}
+    <li>{{ n }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+
+{% for key, rows in section.tables.items() %}
+{% if rows %}
+<section class="metrics">
+  <h2>Tabela: {{ key }}</h2>
+  <div class="month-table-wrap">
+    <table class="month-table">
+      <thead>
+        <tr>
+          {% for col in rows[0].keys() %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows[:25] %}
+        <tr>
+          {% for val in row.values() %}
+          <td>{{ val }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<section class="charts">
+  <h2>Grafi</h2>
+  <div class="chart-grid">
+    {% for chart in section.charts %}
+    <figure>
+      <figcaption>
+        <strong>{{ chart.title }}</strong>
+        <span class="field-help">{{ chart.help }}</span>
+      </figcaption>
+      <img src="{{ url_for('advanced_file', filename=chart.name) }}" alt="{{ chart.title }}" loading="lazy" />
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<footer>
+  <p>
+    {% if prev %}<a href="{{ url_for('analiza_section', slug=prev.slug) }}">← {{ prev.title }}</a>{% endif %}
+    ·
+    {% if next_section %}<a href="{{ url_for('analiza_section', slug=next_section.slug) }}">{{ next_section.title }} →</a>{% endif %}
+  </p>
+</footer>
+{% endblock %}

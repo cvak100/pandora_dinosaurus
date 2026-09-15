@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ app_name }} – Egg Forecast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+      <a href="{{ url_for('index') }}" class="active">Napoved</a>
+      <a href="{{ url_for('analiza') }}">Analiza</a>
+    </nav>
+
+    <header class="hero">
+      <p class="brand">{{ app_brand }} · {{ flock_user }}</p>
+      <h1>Tedenska napoved jajc</h1>
+      <p class="lede">LightGBM + sezonski baseline. Jajca: samo kokoši. Hrana: kokoši + petelin.</p>
+    </header>
+
+    <section class="actions">
+      <a class="btn-link accent-link" href="{{ url_for('napoved_pdf') }}">Download PDF (napoved)</a>
+      <form method="post" action="{{ url_for('run_action', action='refresh') }}">
+        <button type="submit">Osveži napoved</button>
+      </form>
+      <form method="post" action="{{ url_for('run_action', action='rebuild') }}">
+        <button type="submit">1. Obnovi dataset</button>
+      </form>
+      <form method="post" action="{{ url_for('run_action', action='eda') }}">
+        <button type="submit">2. Zaženi EDA</button>
+      </form>
+      <form method="post" action="{{ url_for('run_action', action='train') }}">
+        <button type="submit" class="primary">3. Treniraj model</button>
+      </form>
+      <form method="post" action="{{ url_for('run_action', action='all') }}"
+            onsubmit="return confirm('Zaženem rebuild + EDA + train? Lahko traja minuto ali dve.');">
+        <button type="submit" class="accent">Vse po vrsti</button>
+      </form>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <pre class="banner {{ category }}">{{ message }}</pre>
+      {% endfor %}
+    {% endwith %}
+
+    {% if error %}
+    <div class="banner error">Napaka pri napovedi: {{ error }}</div>
+    {% endif %}
+
+    {% if forecast %}
+    <section class="forecast">
+      <div class="forecast-main">
+        <p class="label">Naslednji teden</p>
+        <p class="week">{{ forecast.week_start }} – {{ forecast.week_end }}
+          <span class="pill">WOY {{ forecast.week_of_year }} · {{ forecast.month }}/{{ forecast.year }}</span>
+        </p>
+        <p class="big">{{ "%.1f"|format(forecast.predicted_eggs) }} <span>jajc</span></p>
+        <p class="sub">≈ {{ "%.1f"|format(forecast.predicted_per_day) }}/dan ·
+          {{ "%.3f"|format(forecast.predicted_per_hen_day) }} jajc/kokoš/dan</p>
+        <p class="explain">{{ forecast.explanation }}</p>
+        {% if forecast.detailed_method %}
+        <details class="method-box">
+          <summary>Kako smo prišli do {{ "%.1f"|format(forecast.predicted_eggs) }} jajc (podrobno)</summary>
+          <ol>
+            {% for line in forecast.detailed_method %}
+              {% if line and not line.startswith('Kako pride') %}
+              <li>{{ line.split(') ', 1)[1] if ') ' in line else line }}</li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+        </details>
+        {% endif %}
+      </div>
+      <div class="forecast-side">
+        <div class="stat">
+          <span class="label">Baseline (sezonski)</span>
+          <strong>{{ "%.1f"|format(forecast.seasonal_baseline_eggs) }}</strong>
+          <em>{{ "%.3f"|format(forecast.baseline_per_hen_day) }} / kokoš / dan</em>
+        </div>
+        <div class="stat">
+          <span class="label">Razlika vs baseline</span>
+          <strong class="{% if forecast.delta_eggs >= 0 %}pos{% else %}neg{% endif %}">
+            {{ "%+.1f"|format(forecast.delta_eggs) }}
+          </strong>
+          <em>{{ "%+.1f"|format(forecast.delta_pct) }} %</em>
+        </div>
+        <div class="stat score score-{{ forecast.score_meaning|replace(' ', '-') }}">
+          <span class="label">Score</span>
+          <strong>{{ "%+.2f"|format(forecast.score) }}</strong>
+          <em>{{ forecast.score_meaning_sl }} · skala ±{{ "%.1f"|format(forecast.score_scale) }} jajc</em>
+        </div>
+      </div>
+
+      <div class="forecast-details">
+        <div class="detail">
+          <span class="label">Jata</span>
+          <p><strong>{{ "%.1f"|format(forecast.hens_mean) }}</strong> kokoši
+            + <strong>{{ "%.0f"|format(forecast.roosters_mean) }}</strong> petelin
+            = <strong>{{ "%.1f"|format(forecast.birds_mean) }}</strong> živali za hrano</p>
+          <p class="hint">{{ forecast.note_flock }}</p>
+        </div>
+        <div class="detail">
+          <span class="label">Zadnji zaključeni teden</span>
+          <p>{{ forecast.last_week_start }} – {{ forecast.last_week_end }}</p>
+          <p><strong>{{ forecast.last_week_eggs }}</strong> jajc ·
+            {{ forecast.last_week_hens }} kokoši ·
+            {{ forecast.last_week_feed_kg }} kg hrane</p>
+        </div>
+        <div class="detail">
+          <span class="label">Vhodi modela (lag jajc)</span>
+          <p>t−1: <strong>{{ forecast.eggs_lag1 }}</strong> ·
+             t−2: <strong>{{ forecast.eggs_lag2 }}</strong> ·
+             t−3: <strong>{{ forecast.eggs_lag3 }}</strong> ·
+             t−4: <strong>{{ forecast.eggs_lag4 }}</strong></p>
+          <p class="hint">Vreme lag1: temp {{ forecast.temp_avg_lag1 }} °C ·
+            padavine {{ forecast.precipitation_lag1 }} mm</p>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if metrics %}
+    <section class="metrics">
+      <h2>Validacija modela</h2>
+      <p class="section-help">
+        Model se uči na starejših tednih, nato preverimo zadnjih
+        <strong>{{ metrics.val_weeks }}</strong> tednov (brez mešanja — časovni split).
+        Manjši MAE/RMSE = boljša napoved. Če je LightGBM MAE manjši od Baseline MAE, model premaga golo sezono.
+      </p>
+      <div class="metric-grid">
+        <div class="metric">
+          <span class="label">Val MAE</span>
+          <strong>{{ "%.2f"|format(metrics.val.mae) }}</strong>
+          <p class="field-help">Povprečna absolutna napaka (jajca/teden) na validaciji. Če MAE = 5.7, se model v povprečju zmoti za ~6 jajc na teden.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Val RMSE</span>
+          <strong>{{ "%.2f"|format(metrics.val.rmse) }}</strong>
+          <p class="field-help">Korenska srednja kvadratna napaka. Bolj kaznuje velike zgreške kot MAE. Če je RMSE bistveno večji od MAE, so občasni večji missi.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Val R²</span>
+          <strong>{{ "%.3f"|format(metrics.val.r2) }}</strong>
+          <p class="field-help">Delež pojasnjene variance (1 = popolno, 0 = kot povprečje, &lt;0 = slabše od povprečja). ~0.5 pomeni, da model ujame približno polovico nihanj.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Baseline MAE</span>
+          <strong>{{ "%.2f"|format(metrics.val_seasonal_baseline.mae) }}</strong>
+          <p class="field-help">Napaka preproste sezonske napovedi (zgodovinska jajca/kokoš za ta teden × število kokoši). Primerjalni “floor” — LightGBM mora biti boljši od tega.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Train / Val tedni</span>
+          <strong>{{ metrics.train_weeks }} / {{ metrics.val_weeks }}</strong>
+          <p class="field-help">Število tednov za učenje / preverjanje. Val so vedno zadnji tedni v času (ne naključni), da ne “pokukamo” v prihodnost.</p>
+        </div>
+        <div class="metric">
+          <span class="label">Val obdobje</span>
+          <strong class="small">{{ metrics.val_start }} → {{ metrics.val_end }}</strong>
+          <p class="field-help">Datumski razpon validacijskih tednov (začetek ISO tedna). Na teh tednih merimo MAE/RMSE/R² zgoraj.</p>
+        </div>
+      </div>
+
+      {% if metrics.top_features %}
+      <h3>Top featureji</h3>
+      <p class="section-help">
+        Kateri vhodi model najbolj uporablja. Številka = relativna pomembnost v LightGBM drevesih (ne enote jajc).
+      </p>
+      <ul class="features">
+        {% for f in metrics.top_features[:8] %}
+        <li>
+          <div class="feat-meta">
+            <code>{{ f.feature }}</code>
+            <span class="field-help">{{ feature_help.get(f.feature, 'Vhod modela za tedensko napoved.') if feature_help else 'Vhod modela za tedensko napoved.' }}</span>
+          </div>
+          <span class="bar" style="--w: {{ (f.importance / metrics.top_features[0].importance * 100)|round }}%"></span>
+          <span class="n">{{ f.importance }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="charts">
+      <h2>Grafi</h2>
+      <p class="section-help">
+        EDA in eval grafi iz <code>reports/</code>. Vsak graf ima kratek opis, kaj prikazuje in zakaj je uporaben.
+      </p>
+      <div class="chart-grid">
+        {% for chart in charts %}
+        <figure>
+          <figcaption>
+            <strong>{{ chart.title }}</strong>
+            <span class="field-help">{{ chart.help }}</span>
+          </figcaption>
+          <img src="{{ url_for('report_file', filename=chart.name) }}" alt="{{ chart.title }}" loading="lazy" />
+        </figure>
+        {% else %}
+        <p>Ni grafov — klikni <strong>Vse po vrsti</strong> zgoraj.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <footer>
+      <p>http://127.0.0.1:5001 · gumbi poženejo rebuild / EDA / train v ozadju</p>
+    </footer>
+  </div>
+</body>
+</html>

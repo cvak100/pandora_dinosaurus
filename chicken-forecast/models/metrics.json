@@ -1,0 +1,70 @@
+{
+  "train": {
+    "mae": 1.1144597534335272,
+    "rmse": 1.4337397173978297,
+    "r2": 0.9722419063150037,
+    "n": 63
+  },
+  "val": {
+    "mae": 5.55331574182348,
+    "rmse": 6.479811693658952,
+    "r2": 0.506182861495314,
+    "n": 16
+  },
+  "val_seasonal_baseline": {
+    "mae": 7.915870390158364,
+    "rmse": 9.56641912902811,
+    "r2": -0.07631699305242545,
+    "n": 16
+  },
+  "val_score_mean": 0.5357830586732184,
+  "train_weeks": 63,
+  "val_weeks": 16,
+  "train_start": "2025-01-27",
+  "train_end": "2026-04-06",
+  "val_start": "2026-04-13",
+  "val_end": "2026-07-27",
+  "best_iteration": 70,
+  "top_features": [
+    {
+      "feature": "eggs_lag1",
+      "importance": 70
+    },
+    {
+      "feature": "temp_avg_lag1",
+      "importance": 51
+    },
+    {
+      "feature": "humidity_avg_lag1",
+      "importance": 47
+    },
+    {
+      "feature": "precipitation_lag1",
+      "importance": 46
+    },
+    {
+      "feature": "temp_min_lag1",
+      "importance": 40
+    },
+    {
+      "feature": "eggs_lag4",
+      "importance": 38
+    },
+    {
+      "feature": "eggs_per_hen_day_lag1",
+      "importance": 37
+    },
+    {
+      "feature": "daylight_minutes_lag1",
+      "importance": 37
+    },
+    {
+      "feature": "eggs_lag2",
+      "importance": 36
+    },
+    {
+      "feature": "eggs_lag3",
+      "importance": 28
+    }
+  ]
+}

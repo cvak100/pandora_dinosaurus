@@ -1,0 +1,41 @@
+# Local / secrets
+.env
+.env.*
+
+# Python
+**/venv/
+**/.venv/
+**/__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Farm exports & personal dumps (repo root)
+*.db
+*.sqlite
+*.sqlite3
+pandora.db
+farm.db
+pandora_export/
+franko_*.txt
+franko_*.pdf
+
+# Weather / year dumps at repo root
+/2025.json
+/2026.json
+
+# Chicken Forecast — never publish real farm data
+chicken-forecast/data/raw/**
+chicken-forecast/data/processed/**
+!chicken-forecast/data/raw/.gitkeep
+!chicken-forecast/data/processed/.gitkeep
+
+chicken-forecast/models/*.joblib
+chicken-forecast/models/*.pkl
+chicken-forecast/reports/*.pdf
+chicken-forecast/reports/franko_*.pdf
